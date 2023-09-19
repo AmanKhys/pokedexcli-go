@@ -1,0 +1,65 @@
+package main
+
+import (
+	"fmt"
+	"log"
+)
+
+func main() {
+	fmt.Println("the available two commands are: help, exit")
+	type cliCommand struct {
+		name          string
+		descriptioiin string
+		callback      func() error
+	}
+
+	var commandExit func() error
+	var commandHelp func() error
+
+	commands := map[string]cliCommand{
+		"help": {
+			name:          "help",
+			descriptioiin: "to view commands available",
+			callback:      commandHelp,
+		},
+		"exit": {
+			name:          "exit",
+			descriptioiin: "to exit the program",
+			callback:      commandExit,
+		},
+	}
+
+	commandExit = func() error {
+		log.Fatal("we are exiting the cli")
+		return nil
+	}
+	commandHelp = func() error {
+		for key, value := range commands {
+			fmt.Println(key, ":", value.descriptioiin)
+		}
+		return nil
+	}
+
+	for {
+		fmt.Print("pokedex >>  ")
+		var input string
+		_, err := fmt.Scan(&input)
+		fmt.Println("you entered:", input)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for key, value := range commands {
+			fmt.Println("using the key:", key, "and the value", value)
+			if input == key {
+				err := value.callback()
+				if err != nil {
+					log.Fatal(err, "this was not what I expected")
+					break
+				}
+			}
+		}
+
+	}
+}
